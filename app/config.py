@@ -1,5 +1,13 @@
 import os
-from pydantic import BaseSettings
+try:
+    from pydantic_settings import BaseSettings
+except ImportError:
+    try:
+        from pydantic import BaseSettings
+    except ImportError:
+        from pydantic import BaseModel
+        class BaseSettings(BaseModel):
+            pass
 
 class Settings(BaseSettings):
     APP_NAME: str = "SentinelAudit-AI"

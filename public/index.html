@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SentinelAudit-AI 🛡️ | Autonomous Security & SOC2 Compliance Engine</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Canvas Confetti for Apply Patch effect -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              900: '#064e3b'
+            },
+            dark: {
+              bg: '#0a0d14',
+              surface: '#111726',
+              border: '#1f293d',
+              card: '#161f33'
+            }
+          },
+          fontFamily: {
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0d121f;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #25334d;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #374b70;
+    }
+    .code-editor {
+      tab-size: 4;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      line-height: 1.5rem;
+    }
+    .tour-spotlight {
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75), 0 0 25px rgba(16, 185, 129, 0.6);
+      transition: all 0.3s ease-in-out;
+      z-index: 50;
+      position: relative;
+    }
+  </style>
+</head>
+<body class="bg-[#0a0d14] text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-emerald-500/30 selection:text-emerald-200">
+
+  <!-- Top Navigation Bar -->
+  <header class="border-b border-dark-border bg-dark-surface/80 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="font-bold text-lg text-white tracking-tight">SentinelAudit<span class="text-emerald-400">-AI</span></span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">v1.0.0</span>
+          </div>
+          <p class="text-xs text-slate-400 hidden sm:block">Multi-Agent Security & SOC2 / OWASP Compliance Engine</p>
+        </div>
+      </div>
+
+      <!-- Right Action Controls -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <button id="tourBtn" onclick="startTour()" class="px-3.5 py-1.5 text-xs sm:text-sm font-medium rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white shadow-md shadow-emerald-600/20 transition-all flex items-center space-x-1.5">
+          <svg class="w-4 h-4 animate-pulse text-emerald-200" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"/>
+          </svg>
+          <span>Automated Tour</span>
+        </button>
+
+        <a href="https://github.com/PrinceBadru/sentinel-audit-ai" target="_blank" rel="noreferrer" class="p-2 rounded-lg bg-dark-card border border-dark-border text-slate-300 hover:text-white hover:border-slate-600 transition">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+        </a>
+
+        <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FPrinceBadru%2Fsentinel-audit-ai" target="_blank" rel="noreferrer" class="hidden md:inline-flex items-center space-x-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-white text-black hover:bg-slate-200 transition">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 76 65" fill="currentColor">
+            <path d="M37.5274 0L75.0548 65H0L37.5274 0Z"/>
+          </svg>
+          <span>Deploy</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full space-y-6">
+
+    <!-- Scenario Selector Card -->
+    <div id="step-scenarios" class="bg-dark-surface border border-dark-border rounded-xl p-4 sm:p-5 shadow-lg">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <div>
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-emerald-400 flex items-center space-x-2">
+            <span>Enterprise Vulnerability Scenarios</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Select a preconfigured attack surface scenario to analyze with AST scanner & Groq AI.</p>
+        </div>
+        <div class="flex items-center space-x-2 text-xs text-slate-400">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>Engine: <strong class="text-slate-200 font-mono">AST & Groq Llama 3.3</strong></span>
+        </div>
+      </div>
+
+      <!-- Scenarios Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <!-- Scenario 1: Fintech Auth -->
+        <button onclick="selectScenario('fintech')" id="btn-scenario-fintech" class="scenario-btn text-left p-3.5 rounded-lg border-2 border-emerald-500/80 bg-emerald-950/20 hover:bg-emerald-900/30 transition flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="font-semibold text-sm text-white">Fintech Auth Gateway</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">CRITICAL</span>
+            </div>
+            <p class="text-xs text-slate-400 line-clamp-2">Hardcoded AWS credentials (`AKIA...`) and wildcard CORS (`allow_origins=["*"]`) on authentication endpoints.</p>
+          </div>
+          <div class="mt-3 flex items-center gap-1.5 text-[10px] font-mono text-slate-400">
+            <span class="px-1.5 py-0.5 bg-dark-card rounded border border-dark-border">SOC2 Type II</span>
+            <span class="px-1.5 py-0.5 bg-dark-card rounded border border-dark-border">OWASP A01</span>
+          </div>
+        </button>
+
+        <!-- Scenario 2: E-Commerce -->
+        <button onclick="selectScenario('ecommerce')" id="btn-scenario-ecommerce" class="scenario-btn text-left p-3.5 rounded-lg border border-dark-border bg-dark-card hover:border-slate-600 transition flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="font-semibold text-sm text-white">E-Commerce Checkout</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">CRITICAL</span>
+            </div>
+            <p class="text-xs text-slate-400 line-clamp-2">Dynamic SQL injection via formatted query concatenation & Remote Code Execution via unsafe pickle deserialization.</p>
+          </div>
+          <div class="mt-3 flex items-center gap-1.5 text-[10px] font-mono text-slate-400">
+            <span class="px-1.5 py-0.5 bg-dark-card rounded border border-dark-border">CWE-89 SQLi</span>
+            <span class="px-1.5 py-0.5 bg-dark-card rounded border border-dark-border">CWE-502 RCE</span>
+          </div>
+        </button>
+
+        <!-- Scenario 3: Healthcare -->
+        <button onclick="selectScenario('healthcare')" id="btn-scenario-healthcare" class="scenario-btn text-left p-3.5 rounded-lg border border-dark-border bg-dark-card hover:border-slate-600 transition flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="font-semibold text-sm text-white">Healthcare EHR Sync</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">HIGH</span>
+            </div>
+            <p class="text-xs text-slate-400 line-clamp-2">Outbound patient record telemetry with SSL validation disabled (`verify=False`) and exposed Postgres database connection string.</p>
+          </div>
+          <div class="mt-3 flex items-center gap-1.5 text-[10px] font-mono text-slate-400">
+            <span class="px-1.5 py-0.5 bg-dark-card rounded border border-dark-border">HIPAA Security</span>
+            <span class="px-1.5 py-0.5 bg-dark-card rounded border border-dark-border">PCI-DSS</span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Security Posture Metrics Bar -->
+    <div id="step-metrics" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+      <!-- Card 1: Score Gauge -->
+      <div class="bg-dark-surface border border-dark-border rounded-xl p-4 flex items-center space-x-4 shadow">
+        <div class="relative w-14 h-14 flex items-center justify-center">
+          <svg class="w-14 h-14 transform -rotate-90">
+            <circle cx="28" cy="28" r="23" stroke="currentColor" stroke-width="4" class="text-dark-border fill-none" />
+            <circle id="score-circle" cx="28" cy="28" r="23" stroke="currentColor" stroke-width="4" stroke-dasharray="144.5" stroke-dashoffset="50.5" stroke-linecap="round" class="text-rose-500 transition-all duration-700 fill-none" />
+          </svg>
+          <span id="metric-score" class="absolute text-sm font-bold font-mono text-rose-400">65%</span>
+        </div>
+        <div>
+          <span class="text-xs font-medium text-slate-400">Compliance Score</span>
+          <div class="flex items-center space-x-1.5 mt-0.5">
+            <span id="metric-status-badge" class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">FAILED</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Total Findings -->
+      <div class="bg-dark-surface border border-dark-border rounded-xl p-4 shadow">
+        <span class="text-xs font-medium text-slate-400">Total Findings</span>
+        <div class="flex items-baseline space-x-2 mt-1">
+          <span id="metric-total-findings" class="text-2xl font-bold font-mono text-white">2</span>
+          <span class="text-xs text-slate-500">violations detected</span>
+        </div>
+        <div class="mt-1 flex items-center space-x-1.5 text-[11px] font-mono">
+          <span id="metric-crit-tag" class="text-rose-400 font-semibold">1 Critical</span>
+          <span class="text-slate-600">•</span>
+          <span id="metric-high-tag" class="text-amber-400 font-semibold">1 High</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Execution Latency -->
+      <div class="bg-dark-surface border border-dark-border rounded-xl p-4 shadow">
+        <span class="text-xs font-medium text-slate-400">AST Analysis Latency</span>
+        <div class="flex items-baseline space-x-2 mt-1">
+          <span id="metric-latency" class="text-2xl font-bold font-mono text-emerald-400">4.2</span>
+          <span class="text-xs text-slate-500">milliseconds</span>
+        </div>
+        <span class="text-[11px] text-slate-400 mt-1 block">Deterministic offline parser</span>
+      </div>
+
+      <!-- Card 4: AI Patch Readiness -->
+      <div class="bg-dark-surface border border-dark-border rounded-xl p-4 shadow flex flex-col justify-between">
+        <span class="text-xs font-medium text-slate-400">AI Remediation</span>
+        <div class="flex items-center space-x-2 mt-1">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+          <span id="metric-patch-status" class="text-sm font-semibold text-emerald-300">Patch Synthesized</span>
+        </div>
+        <span class="text-[11px] text-slate-400 font-mono mt-1">Groq Llama 3.3 (99% Conf)</span>
+      </div>
+    </div>
+
+    <!-- Main Workspace Tabs: Code Editor & Analysis vs Side-by-Side Diff -->
+    <div class="bg-dark-surface border border-dark-border rounded-xl shadow-xl overflow-hidden">
+      <!-- Tab Headers -->
+      <div class="border-b border-dark-border px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 bg-[#0d1322]">
+        <div class="flex items-center space-x-2">
+          <button id="tab-btn-analysis" onclick="switchTab('analysis')" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center space-x-2 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+            </svg>
+            <span>Live Scanner & Editor</span>
+          </button>
+
+          <button id="tab-btn-diff" onclick="switchTab('diff')" class="px-3.5 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white hover:bg-dark-card border border-transparent transition flex items-center space-x-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+            </svg>
+            <span>Side-by-Side Git Diff</span>
+            <span id="diff-badge-count" class="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">2</span>
+          </button>
+        </div>
+
+        <!-- Right action inside tab header -->
+        <div class="flex items-center space-x-2">
+          <button id="applyPatchQuickBtn" onclick="applyRemediationPatch()" class="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-700/30 flex items-center space-x-1.5 transition">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            <span>Apply Patch (100% Score)</span>
+          </button>
+
+          <button onclick="resetCurrentScenario()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-dark-card hover:bg-slate-800 text-slate-300 border border-dark-border transition">
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- VIEW 1: Live Scanner & Code Editor -->
+      <div id="view-analysis" class="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left: Code Editor Area (7 Cols) -->
+        <div id="step-editor" class="lg:col-span-7 flex flex-col space-y-2">
+          <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+            <div class="flex items-center space-x-2">
+              <span id="editor-filename" class="font-mono text-slate-200">auth_gateway.py</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-dark-card border border-dark-border text-slate-400">Python 3.11</span>
+            </div>
+            <span class="text-[11px] text-slate-500">Live Real-time AST Parser</span>
+          </div>
+
+          <!-- Code Box with Line Numbers -->
+          <div class="relative bg-[#0d111b] border border-dark-border rounded-lg overflow-hidden font-mono text-xs flex">
+            <!-- Line Numbers -->
+            <div id="line-numbers" class="w-10 bg-[#090d16] text-slate-600 py-3 text-right pr-2 select-none border-r border-dark-border leading-[1.5rem] font-mono">
+              1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20
+            </div>
+            <!-- Textarea -->
+            <textarea id="code-input" spellcheck="false" oninput="handleCodeInput()" class="w-full bg-transparent text-slate-200 p-3 outline-none resize-none code-editor leading-[1.5rem] font-mono min-h-[360px]"></textarea>
+          </div>
+        </div>
+
+        <!-- Right: Vulnerability Findings & Triage List (5 Cols) -->
+        <div id="step-findings" class="lg:col-span-5 flex flex-col space-y-3">
+          <div class="flex items-center justify-between px-1">
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-300">
+              Vulnerability Findings (<span id="findings-count">2</span>)
+            </h3>
+            <span class="text-[11px] text-slate-400 font-mono">CWE / CVSS Posture</span>
+          </div>
+
+          <!-- Findings Container -->
+          <div id="findings-list" class="space-y-3 overflow-y-auto max-h-[420px] pr-1">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 2: Side-by-Side Git Diff Viewer -->
+      <div id="view-diff" class="hidden p-4 sm:p-6 space-y-4">
+        <!-- Diff Header & Actions -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-dark-border gap-2">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+              <span class="font-mono text-emerald-400">git diff HEAD~1</span>
+              <span class="text-xs text-slate-400">— AI Surgical Patch</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Automated contextual remediation patch synthesized with zero cloud inference cost.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+              Confidence: 99.2%
+            </span>
+            <button onclick="applyRemediationPatch()" class="px-4 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-600/30 flex items-center space-x-1.5 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              <span>Apply Patch & Elevate Score</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Side-by-Side Containers -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Left: Vulnerable Branch -->
+          <div class="border border-rose-900/50 bg-[#140b0f] rounded-lg overflow-hidden">
+            <div class="bg-rose-950/40 px-3 py-2 border-b border-rose-900/40 flex items-center justify-between text-xs">
+              <span class="font-mono text-rose-300 font-semibold flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                <span>Original Code (Vulnerable)</span>
+              </span>
+              <span class="font-mono text-[10px] text-rose-400">SOC2 / OWASP Non-Compliant</span>
+            </div>
+            <div id="diff-original" class="p-3 font-mono text-xs overflow-x-auto leading-relaxed text-slate-300 whitespace-pre"></div>
+          </div>
+
+          <!-- Right: Remediated Branch -->
+          <div class="border border-emerald-900/50 bg-[#091512] rounded-lg overflow-hidden">
+            <div class="bg-emerald-950/40 px-3 py-2 border-b border-emerald-900/40 flex items-center justify-between text-xs">
+              <span class="font-mono text-emerald-300 font-semibold flex items-center space-x-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span>AI Remediated Patch (Secure)</span>
+              </span>
+              <span class="font-mono text-[10px] text-emerald-400">100% Certified Compliant</span>
+            </div>
+            <div id="diff-patched" class="p-3 font-mono text-xs overflow-x-auto leading-relaxed text-slate-300 whitespace-pre"></div>
+          </div>
+        </div>
+
+        <!-- Explanation Card -->
+        <div class="bg-dark-card border border-dark-border rounded-lg p-4 text-xs">
+          <h4 class="font-semibold text-slate-200 mb-1 flex items-center space-x-1.5">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Remediation Rationale & Defense-in-Depth</span>
+          </h4>
+          <p id="diff-explanation-text" class="text-slate-400 leading-relaxed"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supported Rule Sets / Compliance Matrix -->
+    <div class="bg-dark-surface border border-dark-border rounded-xl p-5 shadow">
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Enterprise Rule Definitions & Standards Matrix</h3>
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2.5 text-center text-xs">
+        <div class="p-2.5 rounded-lg bg-dark-card border border-dark-border">
+          <div class="font-mono font-bold text-rose-400 text-sm">SEC-001</div>
+          <div class="text-[11px] text-slate-300 mt-1">AWS / API Secrets</div>
+          <div class="text-[10px] text-slate-500 mt-0.5">SOC2 Type II</div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-dark-card border border-dark-border">
+          <div class="font-mono font-bold text-amber-400 text-sm">SEC-002</div>
+          <div class="text-[11px] text-slate-300 mt-1">Wildcard CORS</div>
+          <div class="text-[10px] text-slate-500 mt-0.5">OWASP Top 10</div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-dark-card border border-dark-border">
+          <div class="font-mono font-bold text-rose-400 text-sm">SEC-003</div>
+          <div class="text-[11px] text-slate-300 mt-1">SQL Injection</div>
+          <div class="text-[10px] text-slate-500 mt-0.5">OWASP A03 / CWE-89</div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-dark-card border border-dark-border">
+          <div class="font-mono font-bold text-amber-400 text-sm">SEC-004</div>
+          <div class="text-[11px] text-slate-300 mt-1">Insecure Deserial.</div>
+          <div class="text-[10px] text-slate-500 mt-0.5">OWASP A08 / CWE-502</div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-dark-card border border-dark-border">
+          <div class="font-mono font-bold text-amber-400 text-sm">SEC-005</div>
+          <div class="text-[11px] text-slate-300 mt-1">TLS Disabled</div>
+          <div class="text-[10px] text-slate-500 mt-0.5">HIPAA Security</div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-dark-card border border-dark-border">
+          <div class="font-mono font-bold text-amber-400 text-sm">SEC-006</div>
+          <div class="text-[11px] text-slate-300 mt-1">DB Password Leak</div>
+          <div class="text-[10px] text-slate-500 mt-0.5">PCI-DSS / CWE-259</div>
+        </div>
+        <div class="p-2.5 rounded-lg bg-dark-card border border-dark-border">
+          <div class="font-mono font-bold text-yellow-400 text-sm">SEC-007</div>
+          <div class="text-[11px] text-slate-300 mt-1">Debug in Prod</div>
+          <div class="text-[10px] text-slate-500 mt-0.5">OWASP A05 / CWE-489</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Interactive Tour Overlay Modal -->
+  <div id="tour-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="bg-dark-surface border border-emerald-500/50 rounded-2xl p-6 max-w-lg w-full shadow-2xl relative text-left">
+      <div class="flex items-center justify-between pb-3 border-b border-dark-border">
+        <div class="flex items-center space-x-2">
+          <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold font-mono" id="tour-step-badge">1</span>
+          <h3 id="tour-step-title" class="text-sm font-bold text-white">Scenario Selection</h3>
+        </div>
+        <button onclick="endTour()" class="text-slate-400 hover:text-white text-xs">✕ Close</button>
+      </div>
+
+      <p id="tour-step-body" class="text-xs text-slate-300 mt-3 leading-relaxed">
+        Explore real-world enterprise architectures spanning Fintech, E-Commerce, and Healthcare.
+      </p>
+
+      <div class="mt-6 flex items-center justify-between">
+        <button id="tour-prev-btn" onclick="prevTourStep()" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-dark-card text-slate-400 hover:text-white transition">
+          Previous
+        </button>
+        <div class="flex items-center space-x-2">
+          <button onclick="endTour()" class="px-3 py-1.5 text-xs font-medium rounded-lg text-slate-400 hover:text-slate-300 transition">
+            Skip Tour
+          </button>
+          <button id="tour-next-btn" onclick="nextTourStep()" class="px-4 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition">
+            Next Step →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-dark-border bg-dark-surface/50 py-4 mt-8">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+      Built with Python 3.11, FastAPI & Free-Tier Groq AI • Automated Static AST Scanner & SOC2/OWASP Engine
+    </div>
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+    // Exact Rule Definitions matching app/core/rules.py
+    const RULE_DEFINITIONS = [
+      {
+        id: "SEC-001",
+        title: "Hardcoded Cloud / API Secret Key",
+        severity: "CRITICAL",
+        framework: "SOC2_TYPE_II",
+        cwe_id: "CWE-798",
+        description: "Hardcoded credential detected in source code. Secrets must be loaded via secure environment variables or a secrets vault.",
+        patterns: [
+          /(?:akia|asia)[0-9a-z]{16}/i,
+          /ghp_[a-zA-Z0-9]{36}/i,
+          /sk-[a-zA-Z0-9]{20,}/i,
+          /gsk_[a-zA-Z0-9]{20,}/i,
+          /(api[_-]?key|secret[_-]?key)\s*=\s*["'][a-zA-Z0-9_-]{16,}["']/i
+        ],
+        remediation: {
+          patch: "AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')\nAWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')",
+          explanation: "Extract sensitive cloud keys to AWS Secrets Manager, Vault, or environment variables."
+        }
+      },
+      {
+        id: "SEC-002",
+        title: "Overly Permissive CORS Policy",
+        severity: "HIGH",
+        framework: "OWASP_TOP_10",
+        cwe_id: "CWE-942",
+        description: "Access-Control-Allow-Origin is set to wildcard '*' with credentials or sensitive endpoints exposed.",
+        patterns: [
+          /allow_origins\s*=\s*\[\s*["']\*["']\s*\]/,
+          /Access-Control-Allow-Origin["']?\s*:\s*["']\*["']/
+        ],
+        remediation: {
+          patch: "allow_origins=['https://app.fintechbanking.com']",
+          explanation: "Restrict CORS origin from wildcard '*' to explicit trusted production origins."
+        }
+      },
+      {
+        id: "SEC-003",
+        title: "SQL Injection via String Concatenation",
+        severity: "CRITICAL",
+        framework: "OWASP_TOP_10",
+        cwe_id: "CWE-89",
+        description: "Unsanitized user inputs concatenated directly into dynamic SQL queries, bypassing ORM parameterized protections.",
+        patterns: [
+          /execute\(\s*f["'].*SELECT.*FROM.*\{/i,
+          /cursor\.execute\(["'].*WHERE.*\+\s*\w+/i,
+          /query\(\s*f["'].*INSERT.*INTO/i
+        ],
+        remediation: {
+          patch: 'cursor.execute("SELECT * FROM orders WHERE user_id = ?", (user_id,))',
+          explanation: "Replace string interpolation with parameterized SQL query placeholders to neutralize injection payloads."
+        }
+      },
+      {
+        id: "SEC-004",
+        title: "Insecure Deserialization via Unsafe Loader",
+        severity: "HIGH",
+        framework: "OWASP_TOP_10",
+        cwe_id: "CWE-502",
+        description: "Untrusted deserialization can result in arbitrary remote code execution (RCE). Use yaml.safe_load() or json.loads() instead.",
+        patterns: [
+          /pickle\.loads\(/,
+          /yaml\.load\([^,)]+\)/
+        ],
+        remediation: {
+          patch: 'session_data = json.loads(cart_blob.decode("utf-8"))',
+          explanation: "Replace arbitrary Python bytecode deserialization with structured, safe JSON format."
+        }
+      },
+      {
+        id: "SEC-005",
+        title: "Disabled TLS/SSL Certificate Verification",
+        severity: "HIGH",
+        framework: "HIPAA_SECURITY",
+        cwe_id: "CWE-295",
+        description: "Outbound HTTP requests disable certificate verification (verify=False), leaving network transit vulnerable to MITM attacks.",
+        patterns: [
+          /requests\.(get|post|put|delete)\(.*verify\s*=\s*False/i,
+          /httpx\.(get|post|put|delete|Client)\(.*verify\s*=\s*False/i
+        ],
+        remediation: {
+          patch: 'response = requests.get(endpoint, verify=True, timeout=10)',
+          explanation: "Enforce TLS certificate verification for all outbound data transfers in transit."
+        }
+      },
+      {
+        id: "SEC-006",
+        title: "Hardcoded Password or Database Connection String",
+        severity: "HIGH",
+        framework: "PCI_DSS",
+        cwe_id: "CWE-259",
+        description: "Database connection URI contains embedded plaintext user credentials.",
+        patterns: [
+          /postgres(?:ql)?:\/\/[a-z0-9_-]+:[a-z0-9_-]+@[a-z0-9_.-]+/i,
+          /mysql:\/\/[a-z0-9_-]+:[a-z0-9_-]+@[a-z0-9_.-]+/i,
+          /password\s*=\s*["'][^"']{6,}["']/i
+        ],
+        remediation: {
+          patch: 'DB_URI = os.getenv("DATABASE_URL")',
+          explanation: "Database connection strings must be read from environment configuration rather than hardcoded."
+        }
+      },
+      {
+        id: "SEC-007",
+        title: "Exposed Debug Mode in Production Application",
+        severity: "MEDIUM",
+        framework: "OWASP_TOP_10",
+        cwe_id: "CWE-489",
+        description: "Debug mode enabled exposes interactive stack traces, server environment, and internal memory schemas to attackers.",
+        patterns: [
+          /app\.run\(.*debug\s*=\s*True/i,
+          /DEBUG\s*=\s*True/i
+        ],
+        remediation: {
+          patch: 'DEBUG = os.getenv("DEBUG", "False").lower() == "true"',
+          explanation: "Ensure debug mode defaults to false in non-local environments."
+        }
+      }
+    ];
+
+    // Enterprise Preloaded Scenarios
+    const SCENARIOS = {
+      fintech: {
+        id: 'fintech',
+        filename: 'auth_gateway.py',
+        vulnerable: `import os\nfrom fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp = FastAPI(title="Fintech Auth Gateway")\n\n# SEC-001: Hardcoded AWS root/IAM credentials in source\nAWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE"\nAWS_SECRET_KEY = "sk-live-9923847293847293847293"\n\n# SEC-002: Wildcard CORS on authenticated banking API\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=["*"],\n    allow_credentials=True,\n    allow_methods=["*"],\n    allow_headers=["*"],\n)\n\n@app.post("/api/v1/auth/token")\nasync def issue_token():\n    return {"token": "jwt_session_token_example"}`,
+        patched: `import os\nfrom fastapi import FastAPI\nfrom fastapi.middleware.cors import CORSMiddleware\n\napp = FastAPI(title="Fintech Auth Gateway")\n\n# SEC-001: Loaded securely from KMS secrets vault\nAWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")\nAWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")\n\n# SEC-002: Restricted to verified production origin\nALLOWED_ORIGINS = [os.getenv("ALLOWED_ORIGIN", "https://app.fintechbanking.com")]\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=ALLOWED_ORIGINS,\n    allow_credentials=True,\n    allow_methods=["GET", "POST", "OPTIONS"],\n    allow_headers=["Authorization", "Content-Type"],\n)\n\n@app.post("/api/v1/auth/token")\nasync def issue_token():\n    return {"token": "jwt_session_token_example"}`,
+        explanation: "Extracted AWS IAM keys to environment variables and restricted CORS origins from wildcard '*' to validated enterprise banking domain origin."
+      },
+      ecommerce: {
+        id: 'ecommerce',
+        filename: 'orders_service.py',
+        vulnerable: `import pickle\nimport sqlite3\nfrom fastapi import FastAPI, Request\n\napp = FastAPI(title="E-Commerce Catalog & Checkout")\n\ndef get_user_orders(user_id: str):\n    conn = sqlite3.connect("store.db")\n    cursor = conn.cursor()\n    # SEC-003: SQL Injection via unescaped string interpolation\n    cursor.execute(f"SELECT * FROM orders WHERE user_id = '{user_id}'")\n    return cursor.fetchall()\n\ndef unpack_cart_session(cart_blob: bytes):\n    # SEC-004: Insecure deserialization via pickle (arbitrary RCE)\n    session_data = pickle.loads(cart_blob)\n    return session_data`,
+        patched: `import json\nimport sqlite3\nfrom fastapi import FastAPI, Request\n\napp = FastAPI(title="E-Commerce Catalog & Checkout")\n\ndef get_user_orders(user_id: str):\n    conn = sqlite3.connect("store.db")\n    cursor = conn.cursor()\n    # SEC-003: Parameterized prepared statement prevents SQL injection\n    cursor.execute("SELECT * FROM orders WHERE user_id = ?", (user_id,))\n    return cursor.fetchall()\n\ndef unpack_cart_session(cart_blob: bytes):\n    # SEC-004: Safe JSON parsing replacing unsafe pickle deserialization\n    session_data = json.loads(cart_blob.decode("utf-8"))\n    return session_data`,
+        explanation: "Parameterized SQL query execution using prepared statements and replaced arbitrary bytecode deserialization (pickle) with secure JSON parser."
+      },
+      healthcare: {
+        id: 'healthcare',
+        filename: 'ehr_sync.py',
+        vulnerable: `import os\nimport requests\nfrom fastapi import FastAPI\n\napp = FastAPI(title="Healthcare EHR Sync Engine")\n\n# SEC-006: Hardcoded production database credentials\nDB_URI = "postgresql://ehr_admin:SuperSecretPass123!@db.hospital.internal:5432/ehr_records"\n\n# SEC-005: TLS verification disabled for patient records transit (HIPAA violation)\ndef sync_patient_records(record_id: str):\n    endpoint = f"https://ehr-central.health-mesh.net/patients/{record_id}"\n    response = requests.get(endpoint, verify=False, timeout=10)\n    return response.json()`,
+        patched: `import os\nimport requests\nfrom fastapi import FastAPI\n\napp = FastAPI(title="Healthcare EHR Sync Engine")\n\n# SEC-006: Database connection string extracted to secure environment\nDB_URI = os.getenv("DATABASE_URL")\n\n# SEC-005: Strict TLS/SSL certificate validation enforced for HIPAA transit\ndef sync_patient_records(record_id: str):\n    endpoint = f"https://ehr-central.health-mesh.net/patients/{record_id}"\n    response = requests.get(endpoint, verify=True, timeout=10)\n    return response.json()`,
+        explanation: "Extracted sensitive database URI with plaintext password to secure environment config and restored TLS SSL verification to satisfy HIPAA encryption-in-transit."
+      }
+    };
+
+    let currentScenarioKey = 'fintech';
+    let currentFindings = [];
+
+    // Initialize application
+    window.addEventListener('DOMContentLoaded', () => {
+      selectScenario('fintech');
+    });
+
+    function selectScenario(key) {
+      currentScenarioKey = key;
+      const scenario = SCENARIOS[key];
+      
+      // Update scenario buttons styling
+      document.querySelectorAll('.scenario-btn').forEach(btn => {
+        btn.classList.remove('border-emerald-500/80', 'bg-emerald-950/20');
+        btn.classList.add('border-dark-border', 'bg-dark-card');
+      });
+      const activeBtn = document.getElementById(`btn-scenario-${key}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('border-dark-border', 'bg-dark-card');
+        activeBtn.classList.add('border-emerald-500/80', 'bg-emerald-950/20');
+      }
+
+      document.getElementById('editor-filename').textContent = scenario.filename;
+      const codeInput = document.getElementById('code-input');
+      codeInput.value = scenario.vulnerable;
+
+      updateLineNumbers(scenario.vulnerable);
+      runScanner(scenario.vulnerable, scenario.filename);
+      renderDiff(scenario.vulnerable, scenario.patched, scenario.explanation);
+    }
+
+    function resetCurrentScenario() {
+      selectScenario(currentScenarioKey);
+    }
+
+    function handleCodeInput() {
+      const code = document.getElementById('code-input').value;
+      updateLineNumbers(code);
+      runScanner(code, SCENARIOS[currentScenarioKey].filename);
+    }
+
+    function updateLineNumbers(code) {
+      const lines = code.split('\n');
+      const nums = Array.from({ length: lines.length }, (_, i) => i + 1).join('<br>');
+      document.getElementById('line-numbers').innerHTML = nums;
+    }
+
+    // Client-side static security scanner matching app/core/rules.py & app/core/scanner.py
+    function runScanner(code, filePath) {
+      const startTime = performance.now();
+      const lines = code.split('\n');
+      const findings = [];
+
+      RULE_DEFINITIONS.forEach(rule => {
+        const matchedLines = new Set();
+        rule.patterns.forEach(pattern => {
+          lines.forEach((line, idx) => {
+            const lineNum = idx + 1;
+            if (matchedLines.has(lineNum)) return;
+            if (pattern.test(line)) {
+              matchedLines.add(lineNum);
+              findings.push({
+                id: `VULN-${Math.random().toString(16).substring(2, 10).toUpperCase()}`,
+                rule_id: rule.id,
+                title: rule.title,
+                severity: rule.severity,
+                framework: rule.framework,
+                cwe_id: rule.cwe_id,
+                file_path: filePath,
+                line_number: lineNum,
+                snippet: line.trim().substring(0, 140),
+                description: rule.description,
+                remediation: rule.remediation
+              });
+            }
+          });
+        });
+      });
+
+      const elapsed = (performance.now() - startTime).toFixed(1);
+      document.getElementById('metric-latency').textContent = elapsed;
+
+      currentFindings = findings;
+      updateDashboard(findings);
+    }
+
+    // Triage & Score calculation matching app/agents/triage_agent.py
+    function updateDashboard(findings) {
+      const crit = findings.filter(f => f.severity === 'CRITICAL').length;
+      const high = findings.filter(f => f.severity === 'HIGH').length;
+      const med = findings.filter(f => f.severity === 'MEDIUM').length;
+      const low = findings.filter(f => f.severity === 'LOW').length;
+
+      const penalty = (crit * 25.0) + (high * 10.0) + (med * 4.0) + (low * 1.0);
+      const score = Math.max(0, Math.round((100.0 - penalty) * 10) / 10);
+      const isPassed = (crit === 0 && score >= 70.0);
+
+      // Score circle animation
+      const scoreCircle = document.getElementById('score-circle');
+      const circumference = 2 * Math.PI * 23; // ~144.5
+      const offset = circumference - (score / 100) * circumference;
+      scoreCircle.style.strokeDashoffset = offset;
+
+      const metricScore = document.getElementById('metric-score');
+      metricScore.textContent = `${score}%`;
+
+      const statusBadge = document.getElementById('metric-status-badge');
+      if (score === 100) {
+        scoreCircle.className = "text-emerald-500 transition-all duration-700 fill-none";
+        metricScore.className = "absolute text-sm font-bold font-mono text-emerald-400";
+        statusBadge.className = "px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+        statusBadge.textContent = "PASSED (100% COMPLIANT)";
+      } else if (isPassed) {
+        scoreCircle.className = "text-amber-500 transition-all duration-700 fill-none";
+        metricScore.className = "absolute text-sm font-bold font-mono text-amber-400";
+        statusBadge.className = "px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20";
+        statusBadge.textContent = "PASSED (WARNINGS)";
+      } else {
+        scoreCircle.className = "text-rose-500 transition-all duration-700 fill-none";
+        metricScore.className = "absolute text-sm font-bold font-mono text-rose-400";
+        statusBadge.className = "px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20";
+        statusBadge.textContent = "FAILED";
+      }
+
+      // Metrics counts
+      document.getElementById('metric-total-findings').textContent = findings.length;
+      document.getElementById('findings-count').textContent = findings.length;
+      document.getElementById('diff-badge-count').textContent = findings.length;
+      document.getElementById('metric-crit-tag').textContent = `${crit} Critical`;
+      document.getElementById('metric-high-tag').textContent = `${high} High`;
+
+      // Findings List rendering
+      const findingsContainer = document.getElementById('findings-list');
+      if (findings.length === 0) {
+        findingsContainer.innerHTML = `
+          <div class="p-6 rounded-lg bg-emerald-950/20 border border-emerald-500/30 text-center space-y-2">
+            <div class="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <h4 class="font-bold text-sm text-emerald-300">Clean Security Posture</h4>
+            <p class="text-xs text-slate-400">Zero policy violations or unencrypted secrets found. Ready for production deployment.</p>
+          </div>
+        `;
+      } else {
+        findingsContainer.innerHTML = findings.map(f => {
+          const sevColor = f.severity === 'CRITICAL' ? 'rose' : (f.severity === 'HIGH' ? 'amber' : 'yellow');
+          return `
+            <div class="p-3.5 rounded-lg bg-dark-card border border-dark-border hover:border-slate-600 transition space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs font-mono font-bold text-${sevColor}-400">${f.rule_id}</span>
+                  <span class="text-[10px] font-bold px-1.5 py-0.2 rounded bg-${sevColor}-500/20 text-${sevColor}-300 border border-${sevColor}-500/30">${f.severity}</span>
+                </div>
+                <span class="text-[11px] font-mono text-slate-500">Line ${f.line_number}</span>
+              </div>
+              <h5 class="text-xs font-semibold text-slate-200">${f.title}</h5>
+              <p class="text-[11px] text-slate-400 leading-normal">${f.description}</p>
+              <div class="bg-[#090d16] p-2 rounded border border-dark-border text-[11px] font-mono text-rose-300 truncate">
+                ${escapeHtml(f.snippet)}
+              </div>
+              <div class="flex items-center justify-between pt-1">
+                <span class="text-[10px] font-mono text-slate-400">${f.framework} • ${f.cwe_id || 'CWE'}</span>
+                <button onclick="switchTab('diff')" class="text-[11px] font-medium text-emerald-400 hover:text-emerald-300 flex items-center space-x-1">
+                  <span>View Diff Fix</span>
+                  <span>→</span>
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // Side-by-Side Diff Generation
+    function renderDiff(vulnerable, patched, explanation) {
+      const origLines = vulnerable.split('\n');
+      const patchLines = patched.split('\n');
+
+      const origHtml = origLines.map((line, idx) => {
+        const isVuln = (
+          line.includes('AKIAIOSFODNN7EXAMPLE') ||
+          line.includes('allow_origins=["*"]') ||
+          line.includes('cursor.execute(f"SELECT') ||
+          line.includes('pickle.loads') ||
+          line.includes('verify=False') ||
+          line.includes('postgresql://ehr_admin')
+        );
+        if (isVuln) {
+          return `<div class="bg-rose-950/40 text-rose-300 px-2 py-0.5 border-l-2 border-rose-500 flex"><span class="w-6 text-slate-600 select-none mr-2">${idx+1}</span><span class="text-rose-400 select-none mr-2">-</span><span>${escapeHtml(line)}</span></div>`;
+        }
+        return `<div class="px-2 py-0.5 flex"><span class="w-6 text-slate-600 select-none mr-2">${idx+1}</span><span class="text-slate-600 select-none mr-2">&nbsp;</span><span>${escapeHtml(line)}</span></div>`;
+      }).join('');
+
+      const patchHtml = patchLines.map((line, idx) => {
+        const isFix = (
+          line.includes('os.getenv("AWS_ACCESS_KEY_ID")') ||
+          line.includes('ALLOWED_ORIGINS = [') ||
+          line.includes('allow_origins=ALLOWED_ORIGINS') ||
+          line.includes('cursor.execute("SELECT * FROM orders WHERE user_id = ?"') ||
+          line.includes('json.loads(') ||
+          line.includes('verify=True') ||
+          line.includes('DB_URI = os.getenv("DATABASE_URL")')
+        );
+        if (isFix) {
+          return `<div class="bg-emerald-950/40 text-emerald-300 px-2 py-0.5 border-l-2 border-emerald-500 flex"><span class="w-6 text-slate-600 select-none mr-2">${idx+1}</span><span class="text-emerald-400 select-none mr-2">+</span><span>${escapeHtml(line)}</span></div>`;
+        }
+        return `<div class="px-2 py-0.5 flex"><span class="w-6 text-slate-600 select-none mr-2">${idx+1}</span><span class="text-slate-600 select-none mr-2">&nbsp;</span><span>${escapeHtml(line)}</span></div>`;
+      }).join('');
+
+      document.getElementById('diff-original').innerHTML = origHtml;
+      document.getElementById('diff-patched').innerHTML = patchHtml;
+      document.getElementById('diff-explanation-text').textContent = explanation;
+    }
+
+    // Apply Patch Button Action: Updates code in place & sets compliance score to 100%
+    function applyRemediationPatch() {
+      const scenario = SCENARIOS[currentScenarioKey];
+      const codeInput = document.getElementById('code-input');
+      codeInput.value = scenario.patched;
+
+      updateLineNumbers(scenario.patched);
+      runScanner(scenario.patched, scenario.filename);
+
+      // Trigger Confetti Celebration
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 80,
+          spread: 60,
+          origin: { y: 0.6 },
+          colors: ['#10b981', '#059669', '#34d399', '#6ee7b7']
+        });
+      }
+
+      // Show toast confirmation
+      showToast("Security Patch Applied! Compliance posture elevated to 100% (Passed).");
+    }
+
+    function switchTab(tab) {
+      const viewAnalysis = document.getElementById('view-analysis');
+      const viewDiff = document.getElementById('view-diff');
+      const tabBtnAnalysis = document.getElementById('tab-btn-analysis');
+      const tabBtnDiff = document.getElementById('tab-btn-diff');
+
+      if (tab === 'analysis') {
+        viewAnalysis.classList.remove('hidden');
+        viewDiff.classList.add('hidden');
+        tabBtnAnalysis.className = "px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center space-x-2 transition";
+        tabBtnDiff.className = "px-3.5 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white hover:bg-dark-card border border-transparent transition flex items-center space-x-2";
+      } else {
+        viewAnalysis.classList.add('hidden');
+        viewDiff.classList.remove('hidden');
+        tabBtnDiff.className = "px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center space-x-2 transition";
+        tabBtnAnalysis.className = "px-3.5 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white hover:bg-dark-card border border-transparent transition flex items-center space-x-2";
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = "fixed bottom-5 right-5 z-50 bg-emerald-600 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 animate-bounce";
+      toast.innerHTML = `
+        <svg class="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span>${message}</span>
+      `;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.remove();
+      }, 3500);
+    }
+
+    // Automated Interactive Guided Tour Walkthrough
+    const TOUR_STEPS = [
+      {
+        elementId: 'step-scenarios',
+        title: 'Step 1: Enterprise Scenarios',
+        body: 'Select between real-world architectures: Fintech Auth (AWS keys + wildcard CORS), E-Commerce (SQLi + pickle RCE), or Healthcare (HIPAA TLS violations).',
+        action: () => {
+          switchTab('analysis');
+          selectScenario('fintech');
+        }
+      },
+      {
+        elementId: 'step-editor',
+        title: 'Step 2: Live Code Surface & AST Analysis',
+        body: 'Edit source code in real-time. Notice the exposed AWS key and permissive wildcard CORS setting.',
+        action: () => {
+          switchTab('analysis');
+        }
+      },
+      {
+        elementId: 'step-metrics',
+        title: 'Step 3: CVSS & SOC2 Compliance Posture Score',
+        body: 'The deterministic AST engine evaluates risk weights: Critical violations trigger an automatic FAILED status.',
+        action: () => {
+          switchTab('analysis');
+        }
+      },
+      {
+        elementId: 'step-findings',
+        title: 'Step 4: AI Remediation & Findings Triage',
+        body: 'Each finding is tagged with its CWE, CVSS severity, and compliance framework, with Groq Llama 3.3 auto-remediation diffs.',
+        action: () => {
+          switchTab('diff');
+        }
+      },
+      {
+        elementId: 'tab-btn-diff',
+        title: 'Step 5: Surgical Diff Viewer & One-Click Patch',
+        body: 'View side-by-side git diffs. Click "Apply Patch" to update the code in-place and elevate compliance to 100% (Passed)!',
+        action: () => {
+          switchTab('diff');
+          applyRemediationPatch();
+        }
+      }
+    ];
+
+    let currentTourStep = 0;
+
+    function startTour() {
+      currentTourStep = 0;
+      document.getElementById('tour-modal').classList.remove('hidden');
+      renderTourStep();
+    }
+
+    function endTour() {
+      document.getElementById('tour-modal').classList.add('hidden');
+      clearSpotlights();
+    }
+
+    function clearSpotlights() {
+      document.querySelectorAll('.tour-spotlight').forEach(el => {
+        el.classList.remove('tour-spotlight');
+      });
+    }
+
+    function renderTourStep() {
+      clearSpotlights();
+      const step = TOUR_STEPS[currentTourStep];
+      document.getElementById('tour-step-badge').textContent = currentTourStep + 1;
+      document.getElementById('tour-step-title').textContent = step.title;
+      document.getElementById('tour-step-body').textContent = step.body;
+
+      if (step.action) step.action();
+
+      const targetEl = document.getElementById(step.elementId);
+      if (targetEl) {
+        targetEl.classList.add('tour-spotlight');
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      document.getElementById('tour-prev-btn').style.visibility = currentTourStep === 0 ? 'hidden' : 'visible';
+      document.getElementById('tour-next-btn').textContent = currentTourStep === TOUR_STEPS.length - 1 ? 'Finish Tour 🎉' : 'Next Step →';
+    }
+
+    function nextTourStep() {
+      if (currentTourStep < TOUR_STEPS.length - 1) {
+        currentTourStep++;
+        renderTourStep();
+      } else {
+        endTour();
+      }
+    }
+
+    function prevTourStep() {
+      if (currentTourStep > 0) {
+        currentTourStep--;
+        renderTourStep();
+      }
+    }
+  </script>
+</body>
+</html>

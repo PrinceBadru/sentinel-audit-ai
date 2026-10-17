@@ -1,25 +1,18 @@
 # SentinelAudit-AI 🛡️
 
-[![Live Interactive Demo](https://img.shields.io/badge/Live%20Demo-sentinel--audit--ai.vercel.app-10b981?style=for-the-badge&logo=vercel&logoColor=white)](https://sentinel-audit-ai.vercel.app)
-[![GitHub Pages Demo](https://img.shields.io/badge/GitHub%20Pages-Live%20Simulation-0284c7?style=for-the-badge&logo=github&logoColor=white)](https://princebadru.github.io/sentinel-audit-ai/)
-
-[![CI/CD Pipeline](https://github.com/PrinceBadru/sentinel-audit-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/PrinceBadru/sentinel-audit-ai/actions)
-[![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.92+-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Groq Llama 3.3](https://img.shields.io/badge/AI-Groq%20Llama%203.3%2070B-f55036)](https://groq.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[[https://vercel.com/button]](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FPrinceBadru%2Fsentinel-audit-ai)
+[[https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-10b981?style=for-the-badge&logo=github&logoColor=white]](https://princebadru.github.io/sentinel-audit-ai/)
+[[https://github.com/PrinceBadru/sentinel-audit-ai/actions/workflows/ci.yml/badge.svg]](https://github.com/PrinceBadru/sentinel-audit-ai/actions)
 
 > **Autonomous Enterprise Security & SOC2/OWASP Compliance Engine** built with Python 3.11, FastAPI, and Free-Tier LLM reasoning (Groq Llama 3.3 70B & Qwen 2.5 72B).
+
+### Live Interactive Web App:
+* **Interactive Live Simulation**: [https://princebadru.github.io/sentinel-audit-ai/](https://princebadru.github.io/sentinel-audit-ai/)
+* **Deploy to Vercel**: Click the "Deploy with Vercel" button above to spin up a dedicated live production deployment instantly.
 
 SentinelAudit-AI is an agentic platform designed to scan application source trees, detect high-risk vulnerabilities and compliance violations (OWASP Top 10, SOC2 Type II, HIPAA, PCI-DSS), compute weighted posture scores, and autonomously synthesize verified code remediation patches with zero cloud runtime costs.
 
 ---
-
-## 🌐 Live Interactive Web App & Demo Walkthrough
-
-Experience the full scanning and remediation engine live in your browser:
-* **Production Deployment**: **[https://sentinel-audit-ai.vercel.app](https://sentinel-audit-ai.vercel.app)**
-* **GitHub Pages Mirror**: **[https://princebadru.github.io/sentinel-audit-ai/](https://princebadru.github.io/sentinel-audit-ai/)**
 
 ### Interactive Capabilities in the Web App
 1. **Pre-Loaded Vulnerability Scenarios**: Instantly test against real-world Fintech, E-Commerce, and Healthcare code snippets with exposed secrets, SQL injections, and wildcard CORS policies.

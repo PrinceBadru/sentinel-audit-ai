@@ -23,7 +23,7 @@ class CodeSecurityScanner:
                         continue
                     if pattern.search(line):
                         matched_lines.add(line_idx)
-                        finding = VulnerabilityFinding(
+                        findings.append(VulnerabilityFinding(
                             id=f"VULN-{uuid.uuid4().hex[:8].upper()}",
                             rule_id=rule["id"],
                             title=rule["title"],
@@ -34,8 +34,7 @@ class CodeSecurityScanner:
                             snippet=line.strip()[:140],
                             description=rule["description"],
                             cwe_id=rule.get("cwe_id")
-                        )
-                        findings.append(finding)
+                        ))
 
         return findings
 

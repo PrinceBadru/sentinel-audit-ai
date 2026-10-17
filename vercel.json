@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "name": "sentinel-audit-ai",
+  "builds": [
+    { "src": "app/main.py", "use": "@vercel/python" },
+    { "src": "public/**/*", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "app/main.py" },
+    { "src": "/docs", "dest": "app/main.py" },
+    { "src": "/redoc", "dest": "app/main.py" },
+    { "src": "/openapi.json", "dest": "app/main.py" },
+    { "src": "/(.*)", "dest": "public/$1" }
+  ]
+}
